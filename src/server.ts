@@ -4,9 +4,10 @@ import jobRoutes from "./routes/jobs"
 import applyRoutes from "./routes/applicaton"
 import cors from "cors"
 import cookieParser from "cookie-parser"
+import "dotenv/config"
 
 const app=express()
-const PORT=4400
+const PORT=process.env.port ||4400
 
 app.use(express.json())
 app.use(cookieParser())
