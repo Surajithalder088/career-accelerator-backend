@@ -1,7 +1,7 @@
-import { PrismaClient, User } from "@prisma/client"
+import { PrismaClient } from "@prisma/client"
 import bcrypt from "bcryptjs"
 import { response } from "express"
-import jwt, { JwtPayload } from "jsonwebtoken"
+import jwt from "jsonwebtoken"
 import nodemailer from "nodemailer"
 
 
