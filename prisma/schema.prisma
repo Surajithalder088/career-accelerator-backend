@@ -1,0 +1,52 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id @default(uuid())
+  name String
+  email String @unique
+  password String
+  address String
+  company String
+  isHR Boolean
+  experience String 
+  isValid Boolean
+  otp Int
+  jobPosts JobPost[]  //the jobs this user posted
+  applicatons Applications[]  //the jobs this user applied
+}
+
+model JobPost{
+  id Int @id @default(autoincrement())
+  title String
+  company String
+  address String
+  salary String
+  description String
+  experience String
+  applications Applications[]
+  userId String //the user who posted
+  user User @relation(fields: [userId],references: [id])
+}
+
+model Applications {
+  id Int @id @default(autoincrement())
+  userId String  //the user who applied
+  user User @relation(fields: [userId],references: [id])
+  jobId Int
+  job JobPost @relation(fields: [jobId],references: [id])
+  status String
+
+}
