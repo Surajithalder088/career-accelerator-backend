@@ -9,8 +9,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -21,12 +21,15 @@ model User {
   address String
   company String
   isHR Boolean
+  resumeUrl String 
   experience String 
   isValid Boolean
   otp Int
   jobPosts JobPost[]  //the jobs this user posted
   applicatons Applications[]  //the jobs this user applied
 }
+
+
 
 model JobPost{
   id Int @id @default(autoincrement())
@@ -36,9 +39,11 @@ model JobPost{
   salary String
   description String
   experience String
+  flags String
   applications Applications[]
   userId String //the user who posted
   user User @relation(fields: [userId],references: [id])
+  updatedAt DateTime @updatedAt
 }
 
 model Applications {
@@ -48,5 +53,6 @@ model Applications {
   jobId Int
   job JobPost @relation(fields: [jobId],references: [id])
   status String
+   updatedAt DateTime @updatedAt
 
 }

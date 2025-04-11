@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.logout = exports.credentials = exports.otpChecking = exports.login = exports.signup = void 0;
+exports.allUsers = exports.updateUser = exports.logout = exports.credentials = exports.otpChecking = exports.login = exports.signup = void 0;
 const client_1 = require("@prisma/client");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const express_1 = require("express");
@@ -46,7 +46,7 @@ const mailSender = (_a) => __awaiter(void 0, [_a], void 0, function* ({ to, subj
     });
 });
 const signup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { name, email, password, address, isHR, company, experience } = req.body;
+    const { name, email, password, address, isHR, company, experience, resumeUrl } = req.body;
     try {
         const existingUser = yield prisma.user.findUnique({
             where: {
@@ -67,7 +67,7 @@ const signup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         };
         const newUser = yield prisma.user.create({
             data: {
-                name, email, password, address, isHR, company, experience, otp, isValid: false
+                name, email, password, address, isHR, company, experience, otp, isValid: false, resumeUrl
             }
         });
         if (!newUser) {
@@ -187,3 +187,49 @@ const logout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.logout = logout;
+const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { name, email, address, isHR, company, experience, resumeUrl } = req.body;
+        const updatedUser = yield prisma.user.update({
+            where: {
+                email
+            },
+            data: {
+                name,
+                email,
+                address,
+                isHR,
+                company,
+                experience,
+                resumeUrl
+            }
+        });
+        if (!updatedUser) {
+            return res.status(400).json({ message: "failed to update the user" });
+        }
+        res.status(200).json({ message: "user updated", user: updatedUser });
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "internal server error", error });
+    }
+});
+exports.updateUser = updateUser;
+const allUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const users = yield prisma.user.findMany({
+            where: {
+                isHR: false
+            }
+        });
+        if (!users) {
+            return res.status(404).json({ message: "Failed to get all users" });
+        }
+        res.status(200).json({ message: "all users are fetched", users });
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "internal server error" });
+    }
+});
+exports.allUsers = allUsers;

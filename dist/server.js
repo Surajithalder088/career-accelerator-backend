@@ -9,12 +9,14 @@ const jobs_1 = __importDefault(require("./routes/jobs"));
 const applicaton_1 = __importDefault(require("./routes/applicaton"));
 const cors_1 = __importDefault(require("cors"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
+require("dotenv/config");
 const app = express();
-const PORT = 4400;
+const PORT = process.env.port || 4400;
 app.use(express.json());
 app.use((0, cookie_parser_1.default)());
 app.use((0, cors_1.default)({
-    origin: 'http://localhost:5173',
+    origin: "http://localhost:5173",
+    // 'https://career-accelerator-app.vercel.app',
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"]
 }));

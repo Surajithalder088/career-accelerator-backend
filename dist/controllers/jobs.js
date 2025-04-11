@@ -14,7 +14,11 @@ const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 const getAllJobs = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const allJobs = yield prisma.jobPost.findMany({});
+        const allJobs = yield prisma.jobPost.findMany({
+            orderBy: {
+                updatedAt: 'desc'
+            }
+        });
         if (!allJobs) {
             return res.status(404).json({ message: "failde to get jobs" });
         }
@@ -51,7 +55,11 @@ const getAllJobsApplied = (req, res) => __awaiter(void 0, void 0, void 0, functi
             return res.status(404).json({ message: "failde to get user" });
         }
         const applicatons = yield prisma.applications.findMany({
-            where: { userId: userid }
+            where: { userId: userid
+            },
+            orderBy: {
+                updatedAt: 'desc'
+            }
         });
         if (!applicatons) {
             return res.status(404).json({ message: "failde to get jobs" });
@@ -67,12 +75,17 @@ exports.getAllJobsApplied = getAllJobsApplied;
 const getAllJobsPosted = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { userid } = req.body;
     try {
-        const user = yield prisma.user.findUnique({ where: { id: userid } });
+        const user = yield prisma.user.findUnique({ where: { id: userid
+            }
+        });
         if (!user) {
             return res.status(404).json({ message: "failde to get user" });
         }
         const jobs = yield prisma.jobPost.findMany({
-            where: { userId: userid }
+            where: { userId: userid },
+            orderBy: {
+                updatedAt: 'desc'
+            }
         });
         if (!jobs) {
             return res.status(404).json({ message: "failde to get jobs" });
@@ -86,7 +99,7 @@ const getAllJobsPosted = (req, res) => __awaiter(void 0, void 0, void 0, functio
 });
 exports.getAllJobsPosted = getAllJobsPosted;
 const newPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { title, company, address, salary, description, experience, userId } = req.body;
+    const { title, company, address, salary, description, experience, userId, flags } = req.body;
     try {
         const user = yield prisma.user.findUnique({ where: { id: userId } });
         if (!user) {
@@ -100,7 +113,8 @@ const newPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 salary,
                 description,
                 experience,
-                userId
+                userId,
+                flags
             }
         });
         if (!newjob) {

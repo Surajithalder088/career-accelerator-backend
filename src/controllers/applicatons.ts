@@ -56,6 +56,23 @@ export const withdraw =async(req ,res)=>{
         res.status(500).json({message:"internal server error"})
     }
 }
+export const applicationByUser=async(req ,res)=>{
+    const userId=req.body.userId;
+    try {
+        const applicaions=await prisma.applications.findMany({
+            where:{
+                userId
+            }
+        })
+        if(!applicaions){
+            return res.status(404).json({message:"failed to get users applications"})
+        }
+        res.status(200).json({message:"all your applications",jobs:applicaions})
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({message:"internal server error"})
+    }
+}
 
 export const applicationByJobid=async(req ,res)=>{
     try {
@@ -63,11 +80,18 @@ export const applicationByJobid=async(req ,res)=>{
         const applications =await prisma.applications.findMany({
             where:{
                 jobId:jobid
+            },
+            include:{
+                user:true
             }
         })
         if(!applications){
             return res.status(404).json({message:"Failed to get application of this job"})
         }
+        
+
+       
+        
         res.status(200).json({message:"these are the applications",applications})
     } catch (error) {
         console.log(error);
@@ -83,7 +107,7 @@ export const applicationStatyusUpdate=async(req ,res)=>{
                 id:id
             },
             data:{
-                status:status
+                status
             }
         })
         if(!applications){
@@ -92,6 +116,6 @@ export const applicationStatyusUpdate=async(req ,res)=>{
         res.status(200).json({message:"these are the applications",applications})
     } catch (error) {
         console.log(error);
-        res.status(500).json({message:'internal server error'})
+        res.status(500).json({message:'internal server error',error})
     }
 }

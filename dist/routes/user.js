@@ -14,4 +14,6 @@ router.post('/login', user_1.login);
 router.post('/otp', user_1.otpChecking);
 router.get('/credentials', user_1.credentials);
 router.post('/logout', user_1.logout);
+router.post('/update', user_1.updateUser);
+router.post('/all-users', user_1.allUsers);
 exports.default = router;

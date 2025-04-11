@@ -16,7 +16,8 @@ type RequestBody={
     address:string,
     isHR:boolean,
     company:string,
-    experience :string
+    experience :string,
+    resumeUrl:string
 }
 interface Data{
     id:string
@@ -61,7 +62,7 @@ const mailSender=async({to,subject,text}:Receiver)=>{
 }
 
 export const signup =async(req,res)=>{
-    const {name,email,password,address,isHR,company,experience}:RequestBody=req.body
+    const {name,email,password,address,isHR,company,experience,resumeUrl}:RequestBody=req.body
     try {
         const existingUser= await prisma.user.findUnique({
             where:{
@@ -89,7 +90,7 @@ export const signup =async(req,res)=>{
 
         const newUser=await prisma.user.create({
             data:{
-                name,email,password,address,isHR,company,experience,otp,isValid:false
+                name,email,password,address,isHR,company,experience,otp,isValid:false,resumeUrl
             }
         })
         if(!newUser){
@@ -224,4 +225,63 @@ export const logout=async(req ,res)=>{
         res.status(500).json({message:"internal server error"})
     }
     
+}
+
+export const updateUser=async(req ,res)=>{
+
+try {
+  const { 
+    name,
+    email,
+    address,
+    isHR,
+    company,
+    experience,
+    resumeUrl}:RequestBody =req.body
+
+    const updatedUser=await prisma.user.update({
+        where:{
+            email
+        },
+        data:{
+    name,
+    email,
+    address,
+    isHR,
+    company,
+    experience,
+    resumeUrl
+        }
+    })
+
+    if(!updatedUser){
+        return res.status(400).json({message:"failed to update the user"})
+    }
+    res.status(200).json({message:"user updated",user:updatedUser})
+
+    
+        
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({message:"internal server error",error})
+        
+    }
+}
+
+export const  allUsers=async(req ,res)=>{
+    try {
+        const users=await prisma.user.findMany({
+            where:{
+                isHR:false
+            }
+        })
+        if(!users){
+            return res.status(404).json({message:"Failed to get all users"})
+        }
+        res.status(200).json({message:"all users are fetched",users})
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({message:"internal server error"})
+        
+    }
 }

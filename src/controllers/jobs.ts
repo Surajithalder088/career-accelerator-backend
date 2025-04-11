@@ -4,7 +4,12 @@ const prisma=new PrismaClient()
 
 export const getAllJobs=async(req ,res)=>{
   try{
-    const allJobs=await prisma.jobPost.findMany({})
+    const allJobs=await prisma.jobPost.findMany({
+      
+        orderBy:{
+          updatedAt:'desc'
+        }
+    })
     if(!allJobs){
         return res.status(404).json({message:"failde to get jobs"})
     }
@@ -42,7 +47,12 @@ export const getAllJobsApplied=async(req ,res)=>{  // it will give all the appli
           return res.status(404).json({message:"failde to get user"})
       }
       const applicatons=await prisma.applications.findMany({
-        where:{userId:userid}
+        where:{userId:userid
+
+        },
+        orderBy:{
+          updatedAt:'desc'
+        }
       })
       if(!applicatons){
         return res.status(404).json({message:"failde to get jobs"})
@@ -60,12 +70,18 @@ export const getAllJobsApplied=async(req ,res)=>{  // it will give all the appli
   export const getAllJobsPosted=async(req ,res)=>{  // it will give all the posted by the user
     const {userid}=req.body
     try{
-      const user=await prisma.user.findUnique({where :{id:userid}})
+      const user=await prisma.user.findUnique({where :{id:userid
+        
+      }
+      })
       if(!user){
           return res.status(404).json({message:"failde to get user"})
       }
       const jobs=await prisma.jobPost.findMany({
-        where:{userId:userid}
+        where:{userId:userid},
+        orderBy:{
+          updatedAt:'desc'
+        }
       })
       if(!jobs){
         return res.status(404).json({message:"failde to get jobs"})
@@ -87,6 +103,7 @@ export const getAllJobsApplied=async(req ,res)=>{  // it will give all the appli
   description: string,
   experience: string,
   userId:string
+  flags:string
  }
 
 
@@ -97,7 +114,8 @@ export const getAllJobsApplied=async(req ,res)=>{  // it will give all the appli
         salary ,
         description,
         experience,
-        userId}:Job=req.body
+        userId,
+        flags}:Job=req.body
     try{
       const user=await prisma.user.findUnique({where :{id:userId}})
       if(!user){
@@ -105,13 +123,14 @@ export const getAllJobsApplied=async(req ,res)=>{  // it will give all the appli
       }
       const newjob=await prisma.jobPost.create({
         data:{
-            title,
+         title,
         company ,
         address ,
         salary ,
         description,
         experience,
-        userId
+        userId,
+        flags
         }
       })
       if(!newjob){

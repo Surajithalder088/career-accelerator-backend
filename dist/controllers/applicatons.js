@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.applicationStatyusUpdate = exports.applicationByJobid = exports.withdraw = exports.newApply = void 0;
+exports.applicationStatyusUpdate = exports.applicationByJobid = exports.applicationByUser = exports.withdraw = exports.newApply = void 0;
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 const newApply = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -57,12 +57,34 @@ const withdraw = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.withdraw = withdraw;
+const applicationByUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.body.userId;
+    try {
+        const applicaions = yield prisma.applications.findMany({
+            where: {
+                userId
+            }
+        });
+        if (!applicaions) {
+            return res.status(404).json({ message: "failed to get users applications" });
+        }
+        res.status(200).json({ message: "all your applications", jobs: applicaions });
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "internal server error" });
+    }
+});
+exports.applicationByUser = applicationByUser;
 const applicationByJobid = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const jobid = parseInt(req.body.jobid);
         const applications = yield prisma.applications.findMany({
             where: {
                 jobId: jobid
+            },
+            include: {
+                user: true
             }
         });
         if (!applications) {
@@ -85,7 +107,7 @@ const applicationStatyusUpdate = (req, res) => __awaiter(void 0, void 0, void 0,
                 id: id
             },
             data: {
-                status: status
+                status
             }
         });
         if (!applications) {
@@ -95,7 +117,7 @@ const applicationStatyusUpdate = (req, res) => __awaiter(void 0, void 0, void 0,
     }
     catch (error) {
         console.log(error);
-        res.status(500).json({ message: 'internal server error' });
+        res.status(500).json({ message: 'internal server error', error });
     }
 });
 exports.applicationStatyusUpdate = applicationStatyusUpdate;
